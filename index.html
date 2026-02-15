@@ -1,43 +1,304 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>My Calculator</title>
-  <link rel="stylesheet" href="calculator.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator - Sreenath Pothineni</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .calculator {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+        }
+
+        .display {
+            background: #333;
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            text-align: right;
+            font-size: 2rem;
+            min-height: 60px;
+            word-wrap: break-word;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 1.2rem;
+            font-size: 1.3rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .number, .decimal {
+            background: white;
+            color: #333;
+        }
+
+        .operator {
+            background: #667eea;
+            color: white;
+        }
+
+        .equal {
+            background: #28a745;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .clear {
+            background: #dc3545;
+            color: white;
+            grid-column: span 2;
+        }
+
+        .footer {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .display {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+
+            button {
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🔢 Simple Calculator</h1>
+        
+        <div class="calculator">
+            <div class="display" id="display">0</div>
+            
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">AC</button>
+                <button class="operator" onclick="deleteLast()">DEL</button>
+                <button class="operator" onclick="appendOperator('÷')">÷</button>
+                
+                <button class="number" onclick="appendNumber('7')">7</button>
+                <button class="number" onclick="appendNumber('8')">8</button>
+                <button class="number" onclick="appendNumber('9')">9</button>
+                <button class="operator" onclick="appendOperator('×')">×</button>
+                
+                <button class="number" onclick="appendNumber('4')">4</button>
+                <button class="number" onclick="appendNumber('5')">5</button>
+                <button class="number" onclick="appendNumber('6')">6</button>
+                <button class="operator" onclick="appendOperator('-')">-</button>
+                
+                <button class="number" onclick="appendNumber('1')">1</button>
+                <button class="number" onclick="appendNumber('2')">2</button>
+                <button class="number" onclick="appendNumber('3')">3</button>
+                <button class="operator" onclick="appendOperator('+')">+</button>
+                
+                <button class="number" onclick="appendNumber('0')">0</button>
+                <button class="decimal" onclick="appendNumber('.')">.</button>
+                <button class="equal" onclick="calculate()">=</button>
+            </div>
+        </div>
 
-<h2>Calculator</h2>
+        <div class="footer">
+            <p>Built by <a href="https://github.com/sreenath630" target="_blank">Sreenath Pothineni</a></p>
+            <p>HTML • CSS • JavaScript</p>
+        </div>
+    </div>
 
-<input type="text" id="display">
+    <script>
+        let display = document.getElementById('display');
+        let currentExpression = '';
+        let firstNumber = '';
+        let operator = '';
+        let waitingForSecondNumber = false;
 
-<br><br>
+        function updateDisplay() {
+            if (currentExpression === '') {
+                display.textContent = '0';
+            } else {
+                display.textContent = currentExpression;
+            }
+        }
 
-<button onclick="press(1)">1</button>
-<button onclick="press(2)">2</button>
-<button onclick="press(3)">3</button>
-<button onclick="press('+')">+</button>
+        function clearDisplay() {
+            currentExpression = '';
+            firstNumber = '';
+            operator = '';
+            waitingForSecondNumber = false;
+            updateDisplay();
+        }
 
-<br><br>
+        function deleteLast() {
+            if (currentExpression.length > 0) {
+                currentExpression = currentExpression.slice(0, -1);
+            }
+            updateDisplay();
+        }
 
-<button onclick="press(4)">4</button>
-<button onclick="press(5)">5</button>
-<button onclick="press(6)">6</button>
-<button onclick="press('-')">-</button>
+        function appendNumber(num) {
+            // Prevent multiple decimals in current number
+            if (num === '.') {
+                let parts = currentExpression.split(/[\+\-×÷]/);
+                let currentNum = parts[parts.length - 1];
+                if (currentNum.includes('.')) {
+                    return;
+                }
+            }
+            
+            currentExpression += num;
+            updateDisplay();
+        }
 
-<br><br>
+        function appendOperator(op) {
+            // If expression is empty, don't add operator
+            if (currentExpression === '') {
+                return;
+            }
+            
+            // If last character is an operator, replace it
+            let lastChar = currentExpression.slice(-1);
+            if (['+', '-', '×', '÷'].includes(lastChar)) {
+                currentExpression = currentExpression.slice(0, -1) + op;
+            } else {
+                currentExpression += op;
+            }
+            
+            updateDisplay();
+        }
 
-<button onclick="press(7)">7</button>
-<button onclick="press(8)">8</button>
-<button onclick="press(9)">9</button>
-<button onclick="press('*')">*</button>
+        function calculate() {
+            if (currentExpression === '') {
+                return;
+            }
 
-<br><br>
+            try {
+                // Replace display operators with JavaScript operators
+                let expression = currentExpression
+                    .replace(/×/g, '*')
+                    .replace(/÷/g, '/');
+                
+                // Check for division by zero
+                if (expression.includes('/0')) {
+                    currentExpression = 'Error';
+                    updateDisplay();
+                    setTimeout(clearDisplay, 1500);
+                    return;
+                }
+                
+                // Calculate result
+                let result = eval(expression);
+                
+                // Round to avoid floating point errors
+                result = Math.round(result * 100000000) / 100000000;
+                
+                currentExpression = result.toString();
+                updateDisplay();
+            } catch (error) {
+                currentExpression = 'Error';
+                updateDisplay();
+                setTimeout(clearDisplay, 1500);
+            }
+        }
 
-<button onclick="press(0)">0</button>
-<button onclick="calculate()">=</button>
-<button onclick="clearDisplay()">C</button>
-<button onclick="press('/')">/</button>
+        // Initialize
+        updateDisplay();
 
-<script src="calculator.js"></script>
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+            
+            if (key >= '0' && key <= '9' || key === '.') {
+                appendNumber(key);
+            } else if (key === '+' || key === '-') {
+                appendOperator(key);
+            } else if (key === '*') {
+                appendOperator('×');
+            } else if (key === '/') {
+                event.preventDefault();
+                appendOperator('÷');
+            } else if (key === 'Enter' || key === '=') {
+                calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearDisplay();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+    </script>
 </body>
 </html>
